@@ -2,69 +2,66 @@
 #include <cmath>
 #include <string>
 #include <vector>
+
 using namespace std;
-//void printInfo(Human);
+
 class Human
 {
 private:
 	string name;
 	int age;
 	char sex;
-	/*Human() 
-	{
-		name = "name1";
-		age = 0;
-		sex = 'M';
-	};*/
+	Human();
+	
 protected:
-	Human() {
-		name = "name1";
-		age = 0;
-		sex = 'M';
-	};
-	Human(string name1, int age1, char sex1) {
-		name = name1;
-		age = age1;
-		sex = sex1;
-	};
-	virtual ~Human()
+	Human(string n, int a, char s) {
+		age = a;
+		sex = s;
+		name = n;
+	}
+	/*virtual ~Human()
 
 	{
 
 		cout << "Destructing derived \n";
 
-	}
+	}*/
 public:
-	void setname(string name1) { name = name1; }
-	void setage( int age1) { age = age1; }
-	void setsex(char sex1) { sex = sex1; }
+	//void printInfo(Human h);
+	void setname(string n) { name = n; }
+	void setage( int a) { age = a; }
+	void setsex(char s) { sex = s; }
 	
-	string getname() { return name ; }
+	const string getname() const {
+		return name;
+	}
 	int getage() { return age; }
 	char getsex() { return sex; }
 };
 class Child : public Human
 {
 private:
+	friend class Parent;
 	string momName;
 	string dadName;
-	int allowance=0;
-	Child()
+	int allowance;
+	Child():Human("name", 10, 'f')
 	{
-		momName = "";
-		dadName = "";
-		allowance = 0;
+	
 	}
 public:
-	Child(string name1, int age1, char sex1,string momName1,string dadName1) {
+	Child(string name1, int age1, char sex1,string momName1,string dadName1) :Human(name1, age1, sex1){
 	
+		allowance = 0;
 		momName = momName1;
 		dadName = dadName1;
-		
 	}
-	int getAllowance2() const {
+	void setAllowance(int a) {
+		allowance = a;
+	}
+	/*int getAllowance2() const {
 		return allowance+5;
-	};
+	};*/
 	int getAllowance() const {
 		return allowance;
 	};
@@ -75,67 +72,66 @@ public:
 	cout << "dad name :" << dadName << endl;
 	}
 };
-class parent : private Human
+class parent : public Human
 {
 private:
+
 	string name;
 	int age;
 	char sex;
-	vector<string> children;
-	parent()
+	vector<Child> children;
+	parent() :Human("name", 10, 'f')
 	{
-	};
-public: 
-	parent(string name1, int age1, char sex1) {
+
+	}
+ public:
+	parent(string name1, int age1, char sex1) :Human(name1, age1, sex1) {
 		name = name1;
 		age = age1;
 		sex = sex1;
 	}
-	void printChild() {};
+	void printChild() {
+		for (unsigned i = 0; i < children.size(); ++i)
+			std::cout << children[i].getname() << ",";
+		std::cout << "\n";
+	}
+	void setChild(Child c) {
+		children.push_back(c);
+	}
+
+	void setChildAllowance(int a, Child &c) {
+		c.setAllowance(a);
+	};
+	void printInfo(Human h) {
+		std::cout << "Name" << h.getname() << "\n";
+		std::cout << "Age" << h.getage() << "\n";
+		std::cout << "Sex" << h.getsex() << "\n";
+	}
 };
-int main(){
-	string name;
-	int age,momage,fatherage;
-	char sex,momsex,fathersex;
-	string momName;
-	string dadName;
-	int allowance;
-	/*	cout << "enter children name:";
-		cin >> name;
-		cout << "enter age:";
-		cin >> age;
-		cout << "enter sex:";
-		cin >> sex;
-		cout << "enter mom Name:";
-		cin >> momName;
-		cout << "enter mom age:";
-		cin >> momage;
-		cout << "enter mom sex:";
-		cin >> momsex;
-		cout << "enter dad Name:";
-		cin >> dadName;
-		cout << "enter father age:";
-		cin >> fatherage;
-		cout << "enter father sex:";
-		cin >> fathersex;*/
-		parent parent1("Homer", 36, 'M');
-		parent parent2("March", 34, 'F');
-		Child child("Lisa", 12, 'F', "Homer", "March");
-		Child child2("Bart", 10, 'M', "Homer", "March");
-		Child child3("Maggie", 3, 'F', "Homer", "March");
-		cout << " Bart¡¯s allowance"<< child.getAllowance() << endl;
-		cout << " Bart¡¯s allowance" << child.getAllowance2() << endl;
-		child.printParent();
-		child2.printParent();
-		child3.printParent();
+void printInfo(Human h) {
+	std::cout << "Name: " << h.getname() << " Age: " << h.getage() << " Sex: " << h.getsex() << "\n" << std::endl;
+}
+
+int main() {
+	
+		parent Homer("Homer", 36, 'M');
+		parent March("March", 34, 'F');
+		Child Lisa("Lisa", 12, 'F', "Homer", "March");
+		Child Bart("Bart", 10, 'M', "Homer", "March");
+		Child Maggie("Maggie", 3, 'F', "Homer", "March");
+		Homer.setChild(Lisa);
+		Homer.setChild(Bart);
+		Homer.setChild(Maggie);
+		March.setChild(Lisa);
+		March.setChild(Bart);
+		March.setChild(Maggie);
+		cout << "Bart's allowance: " << Bart.getAllowance() <<endl;
+		Homer.setChildAllowance(5, Bart);
+		cout << "Bart's allowance: " << Bart.getAllowance() << endl;
+		Bart.printParent();
+		printInfo(March);
+		printInfo(Lisa);
 		system("pause");
 		return 0;
-}
-/*void printInfo(Human human1) {
-	
-	
-	cout <<  human1.getage() << endl;
-	cout << human1.getname() << endl;
-	cout << human1.getsex() << endl;
+	}
 
-}*/
